@@ -1,4 +1,5 @@
 package functions;
+import CreateTables.CreateTables;
 import connectionToDatabase.SistemaBancario_Database;
 
 import java.io.IOException;
@@ -11,8 +12,15 @@ import java.text.ParseException;
 import java.util.Scanner;
 
 
-public class Functions {
-    private Connection connection;
+public class Functions  {
+    private Connection connection = getConnection();
+    CreateTables createTables = new CreateTables();
+
+
+
+    public Functions() throws SQLException, IOException {
+        createTables.Tables();
+    }
 
     public Connection getConnection() throws SQLException, IOException {
         try{
@@ -96,7 +104,7 @@ public class Functions {
 
         String insertClient = "INSERT INTO CLIENTES(CPF, NOME, NASCIMENTO) VALUES (?, ?, ?)";
 
-        PreparedStatement smtm = getConnection().prepareStatement(insertClient);
+        PreparedStatement smtm = connection.prepareStatement(insertClient);
         smtm.setString(1, cpf);
         smtm.setString(2, nome);
         smtm.setString(3, nascimento);
@@ -106,7 +114,7 @@ public class Functions {
 
         String insertAccount = "INSERT INTO ACCOUNTS (BALANCE, CLIENTSID) VALUES (?, ?)";
 
-        smtm = getConnection().prepareStatement(insertAccount);
+        smtm = connection.prepareStatement(insertAccount);
 
         BigDecimal saldo = new BigDecimal(0);
         smtm.setBigDecimal(1, saldo);
@@ -122,7 +130,7 @@ public class Functions {
     public void acessarConta(String cpf) throws SQLException, IOException, ParseException {
         while (true) {
             String searchAccount = "SELECT * FROM ACCOUNTS WHERE CLIENTSID = ?";
-            PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
+            PreparedStatement smtm = connection.prepareStatement(searchAccount);
 
             smtm.setString(1, cpf);
 
@@ -177,7 +185,7 @@ public class Functions {
 
         String select = "SELECT ACCOUNTS.BALANCE FROM ACCOUNTS WHERE CLIENTSID = ?";
 
-        PreparedStatement smtm = getConnection().prepareStatement(select);
+        PreparedStatement smtm = connection.prepareStatement(select);
         smtm.setString(1, cpf);
         ResultSet resultSet = smtm.executeQuery();
 
@@ -188,7 +196,7 @@ public class Functions {
 
 
             String update = "UPDATE ACCOUNTS SET BALANCE = ? WHERE CLIENTSID = ?";
-            smtm = smtm.getConnection().prepareStatement(update);
+            smtm = connection.prepareStatement(update);
             smtm.setBigDecimal(1, novoSaldo);
             smtm.setString(2, cpf);
 
@@ -209,7 +217,7 @@ public class Functions {
 
         String select = "SELECT ACCOUNTS.BALANCE FROM ACCOUNTS WHERE CLIENTSID = ?";
 
-        PreparedStatement smtm = getConnection().prepareStatement(select);
+        PreparedStatement smtm = connection.prepareStatement(select);
         smtm.setString(1, cpf);
         ResultSet resultSet = smtm.executeQuery();
 
@@ -218,7 +226,7 @@ public class Functions {
             BigDecimal novoSaldo = saldoAtual.add(valorDpositado);
 
             String update = "UPDATE ACCOUNTS SET BALANCE = ? WHERE CLIENTSID = ?";
-            smtm = smtm.getConnection().prepareStatement(update);
+            smtm = connection.prepareStatement(update);
 
             smtm.setBigDecimal(1, novoSaldo);
             smtm.setString(2, cpf);
@@ -234,7 +242,7 @@ public class Functions {
 
     public int alterarDadosCadastrados(String cpf) throws SQLException, IOException {
         String searchAccount = "SELECT * FROM CLIENTES WHERE CPF = ?";
-        PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
+        PreparedStatement smtm = connection.prepareStatement(searchAccount);
 
         smtm.setString(1, cpf);
 
@@ -285,7 +293,7 @@ public class Functions {
         System.out.print("INFORME A INFORMAÇÃO CORRETA: ");
         String novaInformacao = scanner.nextLine();
 
-         smtm = smtm.getConnection().prepareStatement(updateInformations);
+         smtm = connection.prepareStatement(updateInformations);
          smtm.setString(1, novaInformacao);
          smtm.setString(2, cpf);
          int linhasAfetadas = smtm.executeUpdate();
@@ -302,7 +310,7 @@ public class Functions {
 
     public void encerrarConta(String cpf) throws SQLException, IOException {
         String searchAccount = "SELECT * FROM ACCOUNTS WHERE CLIENTSID = ?";
-        PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
+        PreparedStatement smtm = connection.prepareStatement(searchAccount);
 
         smtm.setString(1, cpf);
 
@@ -312,12 +320,12 @@ public class Functions {
             try{
                 connection.setAutoCommit(false);
                 String deleteAccount = "DELETE FROM ACCOUNTS WHERE CLIENTSID = ?";
-                smtm = smtm.getConnection().prepareStatement(deleteAccount);
+                smtm = connection.prepareStatement(deleteAccount);
                 smtm.setString(1, cpf);
                 smtm.executeUpdate();
 
                 String deleteClient = "DELETE FROM CLIENTES WHERE CPF = ?";
-                smtm = smtm.getConnection().prepareStatement(deleteClient);
+                smtm = connection.prepareStatement(deleteClient);
                 smtm.setString(1, cpf);
                 smtm.executeUpdate();
 
