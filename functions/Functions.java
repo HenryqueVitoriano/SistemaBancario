@@ -309,19 +309,29 @@ public class Functions {
         ResultSet resultSet = smtm.executeQuery();
 
         if (resultSet.next()){
-            String deleteAccount = "DELETE FROM ACCOUNTS WHERE CLIENTSID = ?";
-            smtm = smtm.getConnection().prepareStatement(deleteAccount);
-            smtm.setString(1, cpf);
-            smtm.execute();
+            try{
+                connection.setAutoCommit(false);
+                String deleteAccount = "DELETE FROM ACCOUNTS WHERE CLIENTSID = ?";
+                smtm = smtm.getConnection().prepareStatement(deleteAccount);
+                smtm.setString(1, cpf);
+                smtm.executeUpdate();
 
-            String deleteClient = "DELETE FROM CLIENTES WHERE CPF = ?";
-            smtm = smtm.getConnection().prepareStatement(deleteClient);
-            smtm.setString(1, cpf);
-            smtm.execute();
+                String deleteClient = "DELETE FROM CLIENTES WHERE CPF = ?";
+                smtm = smtm.getConnection().prepareStatement(deleteClient);
+                smtm.setString(1, cpf);
+                smtm.executeUpdate();
 
-            smtm.close();
+                smtm.close();
+                connection.commit();
 
-            System.out.println("CONTA DELETADA COM SUCESSO!");
+                System.out.println("CONTA DELETADA COM SUCESSO!");
+            }catch (Exception e){
+                getConnection().rollback();
+                System.out.println("ERRO AO DELETAR CONTA!");
+            }finally {
+                connection.setAutoCommit(true);
+            }
+
         }else {
             System.out.println("CONTA NÃO ENCONTRADA!");
         }
