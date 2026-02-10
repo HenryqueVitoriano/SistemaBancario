@@ -9,7 +9,7 @@ import java.text.ParseException;
 
 public class Sistema {
     public static void main(String[] args) throws SQLException, IOException, ParseException {
-        Functions functions = new Functions();
-        functions.options();
+        Functions RedBank = new Functions();
+        RedBank.options();
         }
     }

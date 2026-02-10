@@ -1,7 +1,6 @@
 package functions;
 import connectionToDatabase.SistemaBancario_Database;
 
-import javax.swing.plaf.PanelUI;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -10,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Scanner;
-import java.util.SequencedCollection;
+
 
 public class Functions {
     private Connection connection;
@@ -36,11 +35,11 @@ public class Functions {
         System.out.println("\u001B[31m║   MENU PRINCIPAL   ║\u001B[0m");
         System.out.println("\u001B[31m╚════════════════════╝\u001B[0m");
 
-        System.out.println("BEM VINDO AO BANCO SANTO ANDRÉ! AQUELE VERMELINHO" +
+        System.out.println("BEM VINDO AO REDBANK!" +
                 "\n O QUE DESEJA FAZER HOJE: " +
                 "\n 1 - |CRIAR UMA CONTA| " +
                 "\n 2 - |ACESSAR SUA CONTA|" +
-                "\n 3 - |ATUALIZAR DADOSs CADASTRADOS|" +
+                "\n 3 - |ATUALIZAR DADOS CADASTRADOS|" +
                 "\n 4 - |ENCERRAR CONTA :(|"  +
                 "\n 5 - |SAIR....|"
         );
@@ -67,11 +66,19 @@ public class Functions {
                 cpf = scanner.next();
                 confirm = alterarDadosCadastrados(cpf);
 
-                if (confirm == -1){
+                while (confirm != 0){
+                    confirm = alterarDadosCadastrados(cpf);
+                }
+
+                options();
+
+                break;
+            case "4":
+                System.out.println("INFORME SEU CPF: ");
+                cpf = scanner.next();
+                confirm = encerrarConta(cpf);
+                if (confirm < 0){
                     options();
-                }else{
-                    System.out.println("OPÇÃO INVÁLIDA! TENTE NOVAMENTE");
-                    alterarDadosCadastrados(cpf);
                 }
                 break;
             case "5":
@@ -171,7 +178,6 @@ public class Functions {
         return 0;
     }
 
-    //TODO
     public void sacar(String cpf) throws SQLException, IOException, ParseException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("INFORME QUAL O VALOR DESEJADO PARA SAQUE: ");
@@ -205,8 +211,8 @@ public class Functions {
         }
 
     }
-    //TODO
-    public void depositar(String cpf) throws SQLException, IOException, ParseException {
+
+    public void depositar(String cpf) throws SQLException, IOException{
         Scanner scanner = new Scanner(System.in);
         System.out.println("INFORME QUAL O VALOR DESEJADO PARA DEPÓSITO: ");
         System.out.println("DIGITE: ");
@@ -232,7 +238,6 @@ public class Functions {
                 System.out.println("VALOR FOI DEPOSITADO NA SUA CONTA");
                 System.out.println("SALDO ATUAL: " + novoSaldo);
                 smtm.close();
-                acessarConta(cpf);
             }
 
         }
@@ -279,10 +284,12 @@ public class Functions {
             case "1" -> updateInformations = "UPDATE CLIENTES SET NOME = ? WHERE CPF = ?";
             case "2" -> updateInformations = "UPDATE CLIENTES SET NASCIMENTO = ? WHERE CPF = ?";
             case "3" -> {
-                return -1;
+                System.out.println("SAINDO DA ABA ATUALIZAR CADASTRO");
+                return 0;
             }
             default -> {
-                return 2;
+                System.out.println("OPÇÃO INVÁLIDA");
+                return -1;
             }
 
         }
@@ -297,12 +304,40 @@ public class Functions {
 
          if (linhasAfetadas > 0){
              System.out.println("DADOS CADASTRADOS ATUALIZADOS");
-             alterarDadosCadastrados(cpf);
          }else {
              return -1;
          }
 
          smtm.close();
+        return 0;
+    }
+
+    public int encerrarConta(String cpf) throws SQLException, IOException {
+        String searchAccount = "SELECT * FROM ACCOUNTS WHERE CLIENTSID = ?";
+        PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
+
+        smtm.setString(1, cpf);
+
+        ResultSet resultSet = smtm.executeQuery();
+
+        if (resultSet.next()){
+            String deleteAccount = "DELETE FROM ACCOUNTS WHERE CLIENTSID = ?";
+            smtm = smtm.getConnection().prepareStatement(deleteAccount);
+            smtm.setString(1, cpf);
+            smtm.execute();
+
+            String deleteClient = "DELETE FROM CLIENTES WHERE CPF = ?";
+            smtm = smtm.getConnection().prepareStatement(deleteClient);
+            smtm.setString(1, cpf);
+            smtm.execute();
+
+            smtm.close();
+
+            System.out.println("CONTA DELETADA COM SUCESSO!");
+        }else {
+            System.out.println("CONTA NÃO ENCONTRADA!");
+            return -1;
+        }
         return 0;
     }
 
