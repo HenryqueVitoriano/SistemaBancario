@@ -28,70 +28,63 @@ public class Functions {
         return connection;
     }
 
+    private final Scanner scanner = new Scanner(System.in);
+
     //FUNÇOES
     public void options() throws SQLException, IOException, ParseException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("\u001B[31m╔════════════════════╗\u001B[0m");
-        System.out.println("\u001B[31m║   MENU PRINCIPAL   ║\u001B[0m");
-        System.out.println("\u001B[31m╚════════════════════╝\u001B[0m");
+        while (true) {
+            System.out.println("\u001B[31m╔════════════════════╗\u001B[0m");
+            System.out.println("\u001B[31m║   MENU PRINCIPAL   ║\u001B[0m");
+            System.out.println("\u001B[31m╚════════════════════╝\u001B[0m");
 
-        System.out.println("BEM VINDO AO REDBANK!" +
-                "\n O QUE DESEJA FAZER HOJE: " +
-                "\n 1 - |CRIAR UMA CONTA| " +
-                "\n 2 - |ACESSAR SUA CONTA|" +
-                "\n 3 - |ATUALIZAR DADOS CADASTRADOS|" +
-                "\n 4 - |ENCERRAR CONTA :(|"  +
-                "\n 5 - |SAIR....|"
-        );
+            System.out.println("BEM VINDO AO REDBANK!" +
+                    "\n O QUE DESEJA FAZER HOJE: " +
+                    "\n 1 - |CRIAR UMA CONTA| " +
+                    "\n 2 - |ACESSAR SUA CONTA|" +
+                    "\n 3 - |ATUALIZAR DADOS CADASTRADOS|" +
+                    "\n 4 - |ENCERRAR CONTA :(|" +
+                    "\n 5 - |SAIR....|"
+            );
 
-        System.out.println("DIGITE: ");
-        String opcao = scanner.next();
-        String cpf;
-        int confirm;
+            System.out.println("DIGITE: ");
+            String opcao = scanner.next();
+            String cpf;
+            int confirm;
 
-        switch (opcao){
-            case "1":
-                criarConta();
-                break;
-            case "2":
-                System.out.println("INFORME SEU CPF: ");
-                cpf = scanner.next();
-                confirm = acessarConta(cpf);
-                if (confirm < 0){
-                    options();
-                }
-                break;
-            case "3":
-                System.out.println("INFORME SEU CPF: ");
-                cpf = scanner.next();
-                confirm = alterarDadosCadastrados(cpf);
-
-                while (confirm != 0){
+            switch (opcao) {
+                case "1":
+                    criarConta();
+                    break;
+                case "2":
+                    System.out.println("INFORME SEU CPF: ");
+                    cpf = scanner.next();
+                    acessarConta(cpf);
+                    break;
+                case "3":
+                    System.out.println("INFORME SEU CPF: ");
+                    cpf = scanner.next();
                     confirm = alterarDadosCadastrados(cpf);
-                }
 
-                options();
-
-                break;
-            case "4":
-                System.out.println("INFORME SEU CPF: ");
-                cpf = scanner.next();
-                confirm = encerrarConta(cpf);
-                if (confirm < 0){
-                    options();
-                }
-                break;
-            case "5":
-                System.out.println("OBRIGADO POR USAR NOSSOS SERVIÇOS");
-                return;
-            default:
-                System.out.println("OPÇÃO INVÁLIDA");
+                    while (confirm != 0) {
+                        confirm = alterarDadosCadastrados(cpf);
+                    }
+                    break;
+                case "4":
+                    System.out.println("INFORME SEU CPF: ");
+                    cpf = scanner.next();
+                    encerrarConta(cpf);
+                    break;
+                case "5":
+                    System.out.println("OBRIGADO POR USAR NOSSOS SERVIÇOS");
+                    return;
+                default:
+                    System.out.println("OPÇÃO INVÁLIDA");
+            }
         }
     }
 
     public void criarConta() throws SQLException, IOException, ParseException {
         System.out.println("OTIMO! PARA ABRIR UMA CONTA PRECISAREMOS DE ALGUMAS INFORMAÇÕES....");
-        Scanner scanner = new Scanner(System.in);
         System.out.println("INFORME SEU CPF: ");
         String cpf = scanner.nextLine();
 
@@ -124,62 +117,60 @@ public class Functions {
 
 
         System.out.println("USUÁRIO CADASTRADO E CONTA CRIADA COM SUCESSO");
-        options();
     }
 
-    public int acessarConta(String cpf) throws SQLException, IOException, ParseException {
-        Scanner scanner = new Scanner(System.in);
-        String searchAccount = "SELECT * FROM ACCOUNTS WHERE CLIENTSID = ?";
-        PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
+    public void acessarConta(String cpf) throws SQLException, IOException, ParseException {
+        while (true) {
+            String searchAccount = "SELECT * FROM ACCOUNTS WHERE CLIENTSID = ?";
+            PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
 
-        smtm.setString(1, cpf);
+            smtm.setString(1, cpf);
 
-        ResultSet resultSet = smtm.executeQuery();
+            ResultSet resultSet = smtm.executeQuery();
 
-        if (resultSet.next()){
-            int id = resultSet.getInt("ID");
-            BigDecimal saldo = resultSet.getBigDecimal("balance");
-            String clientCpf = resultSet.getString("ClientsID");
+            if (resultSet.next()) {
+                int id = resultSet.getInt("ID");
+                BigDecimal saldo = resultSet.getBigDecimal("balance");
+                String clientCpf = resultSet.getString("ClientsID");
 
-            System.out.println("\u001B[31m╔════════════════════╗\u001B[0m");
-            System.out.println("\u001B[31m║  DADOS DA CONTA:   ║\u001B[0m");
-            System.out.println("\u001B[31m╚════════════════════╝\u001B[0m");
+                System.out.println("\u001B[31m╔════════════════════╗\u001B[0m");
+                System.out.println("\u001B[31m║  DADOS DA CONTA:   ║\u001B[0m");
+                System.out.println("\u001B[31m╚════════════════════╝\u001B[0m");
 
-            System.out.println(
-                    "SALDO ATUAL: " + saldo +
-                    "\nID DA CONTA: " + id +
-                    "\nID DO CLIENTE: " + clientCpf
+                System.out.println(
+                        "SALDO ATUAL: " + saldo +
+                                "\nID DA CONTA: " + id +
+                                "\nID DO CLIENTE: " + clientCpf
+                );
+            } else {
+                System.out.println("CONTA NÃO ENCONTRADA!");
+                return;
+            }
+
+
+            System.out.println("O QUE DESEJA FAZER NA SUA CONTA: " +
+                    "\n 1 - SACAR" +
+                    "\n 2 - DEPOSITAR " +
+                    "\n 3 - SAIR DA CONTA"
             );
-        }else {
-            System.out.println("CONTA NÃO ENCONTRADA!");
-            return -1;
+
+            System.out.println("DIGITE: ");
+
+            String option = scanner.nextLine();
+
+            switch (option) {
+                case "1" -> sacar(cpf);
+                case "2" -> depositar(cpf);
+                case "3" -> {
+                    return;
+                }
+            }
+
+            smtm.close();
         }
-
-
-
-        System.out.println("O QUE DESEJA FAZER NA SUA CONTA: " +
-                "\n 1 - SACAR" +
-                "\n 2 - DEPOSITAR " +
-                "\n 3 - SAIR DA CONTA"
-        );
-
-        System.out.println("DIGITE: ");
-
-        String option = scanner.nextLine();
-
-        switch (option){
-            case "1" -> sacar(cpf);
-            case "2" -> depositar(cpf);
-            case "3" -> options();
-        }
-
-        smtm.execute();
-        smtm.close();
-        return 0;
     }
 
     public void sacar(String cpf) throws SQLException, IOException, ParseException {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("INFORME QUAL O VALOR DESEJADO PARA SAQUE: ");
         System.out.println("DIGITE: ");
         BigDecimal valorSacado = scanner.nextBigDecimal();
@@ -206,17 +197,15 @@ public class Functions {
                 System.out.println("VALOR FOI SACADO DE SUA CONTA");
                 System.out.println("SALDO ATUAL: " + novoSaldo);
                 smtm.close();
-                acessarConta(cpf);
             }
         }
 
     }
 
     public void depositar(String cpf) throws SQLException, IOException{
-        Scanner scanner = new Scanner(System.in);
         System.out.println("INFORME QUAL O VALOR DESEJADO PARA DEPÓSITO: ");
         System.out.println("DIGITE: ");
-        BigDecimal valorSacado = scanner.nextBigDecimal();
+        BigDecimal valorDpositado = scanner.nextBigDecimal();
 
         String select = "SELECT ACCOUNTS.BALANCE FROM ACCOUNTS WHERE CLIENTSID = ?";
 
@@ -226,7 +215,7 @@ public class Functions {
 
         if (resultSet.next()) {
             BigDecimal saldoAtual = resultSet.getBigDecimal("balance");
-            BigDecimal novoSaldo = saldoAtual.add(valorSacado);
+            BigDecimal novoSaldo = saldoAtual.add(valorDpositado);
 
             String update = "UPDATE ACCOUNTS SET BALANCE = ? WHERE CLIENTSID = ?";
             smtm = smtm.getConnection().prepareStatement(update);
@@ -269,7 +258,6 @@ public class Functions {
             return -1;
         }
 
-        Scanner scanner = new Scanner(System.in);
         System.out.println("O QUE DESEJA ATUALIZAR: " +
                 "\n1 - NOME CADASTRADO" +
                 "\n2 - DATA DE NASCIMENTO CADASTRADA" +
@@ -312,7 +300,7 @@ public class Functions {
         return 0;
     }
 
-    public int encerrarConta(String cpf) throws SQLException, IOException {
+    public void encerrarConta(String cpf) throws SQLException, IOException {
         String searchAccount = "SELECT * FROM ACCOUNTS WHERE CLIENTSID = ?";
         PreparedStatement smtm = getConnection().prepareStatement(searchAccount);
 
@@ -336,9 +324,7 @@ public class Functions {
             System.out.println("CONTA DELETADA COM SUCESSO!");
         }else {
             System.out.println("CONTA NÃO ENCONTRADA!");
-            return -1;
         }
-        return 0;
     }
 
 }
