@@ -37,7 +37,9 @@ git clone https://github.com/HenryqueVitoriano/SistemaBancario.git
   - Edite para suas credenciais:
 
       banco.url=jdbc:mysql://localhost/NOMEDOBANCO
+    
       banco.usuario=SEU_USUARIO
+    
       banco.senha=SUA_SENHA
 
 4. Ajustar o Path
